@@ -25,8 +25,7 @@ fastify.route({
 
 fastify.listen(PORT, (err,address) => {
     if (err) {
-        console.error(err);
-        process.exit(1);
+        console.error(PORT);
     }
     fastify.log.info(`server listening on ${address}`)
 })
