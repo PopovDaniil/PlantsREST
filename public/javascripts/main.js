@@ -1,12 +1,17 @@
 window.onload = () => {
     randomCards(model,"#randomCards",6);
 }
-
+/**
+ * 
+ * @param {String} name 
+ * @param {String} latinName 
+ * @param {String} description 
+ */
 function card(name, latinName, description) {
     return `
     <div class="w3-padding w3-half">
             <section class="w3-card-4 w3-container w3-theme w3-margin-top">
-                <img src="/images/${latinName}.jpg" alt="" class="w3-col small w3-left-align w3-margin">
+                <img src="/images/${latinName.toLowerCase()}.jpg" alt="" class="w3-col small w3-left-align w3-margin">
                 <a class="w3-xlarge" href="/catalog/${latinName}">${name}</a>
                 <p class="w3-small">${description}
             </section>
