@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="stylesheets/w3.css">
+    <link rel="stylesheet" href="stylesheets/w3-theme-green.css">
+    <link rel="stylesheet" href="stylesheets/style.css">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
+    <link rel="shortcut icon" href="icons/icon192.png" type="image/png">
+    <link rel="manifest" href="manifest.webmanifest">
+    <script src="javascripts/utils.js"></script>
+    <title>Document</title>
+</head>
+
+<body>
+    <header class="w3-display-container w3-text-white">
+        <h1
+            class="w3-container w3-display-middle w3-center w3-xxxlarge back-black-opacity w3-text-theme w3-round-large">
+            <img src="/images/logo.png" alt="" class="logo w3-margin">
+            <span style="vertical-align: text-top;">Энциклопедия растений</span>
+        </h1>
+    </header>
+
+    <menu class="w3-theme-d2 w3-top">
+        <div class="w3-center">
+            <a href="/" class="w3-button w3-hover-theme">Главная</a>
+            <div class="w3-dropdown-hover">
+                <a href="/catalog" class="w3-button w3-hover-theme">Каталог</a>
+                <div class="w3-dropdown-content w3-bar-block w3-card-4 fixed w3-theme-d2">
+                    <a href="/catalog/scientific" class="w3-bar-item w3-button w3-hover-theme">Научная классификация</a>
+                    <a href="/catalog/lifeform" class="w3-bar-item w3-button w3-hover-theme">По жизненной форме</a>
+                    <a href="" class="w3-bar-item w3-button w3-hover-theme">По времени цветения</a>
+                </div>
+            </div>
+            <a href="/about" class="w3-button w3-hover-theme">О нас</a>
+            <div class="w3-dropdown-click">
+                <a class="material-icons w3-button w3-hover-theme" onclick="showDropdown('search')">search</a>
+                <div class="w3-dropdown-content w3-bar-block w3-card-4 fixed w3-theme-d2" id="search">
+                    <input type="search" class="w3-bar-item" placeholder="Поиск по каталогу">
+                </div>
+            </div>
+            <div class="w3-display-right">
+                <div class="w3-padding w3-large w3-hide-medium w3-hide-small underline" onclick="copy()" id="email">
+                    botsad-don@gmail.com
+                </div>
+                <a class="w3-button w3-hover-theme w3-hide-large" onclick="showAside()">Aside</a>
+            </div>
+        </div>
+    </menu>
+
+    <h2>Главная</h2>
+    <div class="flex-container">
+        {{#each blocks}}
+        <div class="w3-padding w3-half">
+            <section class="w3-card-4 w3-container w3-theme w3-margin-top">
+                <img src="/images/{{LatinName}}.jpg" alt="" class="w3-col small w3-left-align w3-margin">
+                <a class="w3-xlarge" href="/catalog/{{LatinName}}">{{Name}}</a>
+                <p class="w3-small">{{Description}}
+            </section>
+        </div>
+        {{/each}}
+    </div>
+
+    <aside class="w3-container w3-col s6 m3 l3">
+        <div class="w3-card w3-section w3-theme">
+            <div class="w3-xlarge w3-center w3-padding"><a href="/calendar">Календарь цветения</a></div>
+            <ul class="w3-container w3-ul">
+                <li class="w3-row">
+                    <p class="w3-col l3 w3-text-indigo w3-large w3-center">5 июня</p>
+                    <p class="w3-col l6 w3-large w3-center">Тополь</p>
+                    <img src="/images/Polytrichum_commune-small.jpeg" class="w3-col l3" alt="">
+                </li>
+                <li class="w3-row">
+                    <p class="w3-col l3 w3-text-indigo w3-large w3-center">12 июня</p>
+                    <p class="w3-col l6 w3-large w3-center">Ива</p>
+                    <img src="/images/Polytrichum_commune-small.jpeg" class="w3-col l3" alt="">
+                </li>
+                <li class="w3-row">
+                    <p class="w3-col l3 w3-text-indigo w3-large w3-center">19 июня</p>
+                    <p class="w3-col l6 w3-large w3-center">Вяз</p>
+                    <img src="/images/Polytrichum_commune-small.jpeg" class="w3-col l3" alt="">
+                </li>
+                <li class="w3-row">
+                    <p class="w3-col l3 w3-text-indigo w3-large w3-center">26 июня</p>
+                    <p class="w3-col l6 w3-large w3-center">Липа</p>
+                    <img src="/images/Polytrichum_commune-small.jpeg" class="w3-col l3" alt="">
+                </li>
+            </ul>
+        </div>
+        <div class="w3-card w3-theme">
+            <div class="w3-xlarge w3-center w3-padding"><a href="/news">Новости ботанического сада</a></div>
+            <ul class="w3-container w3-ul">
+                <li class="w3-row">
+                    <a>Появилось 3 новых сорта роз</a>
+                </li>
+                <li class="w3-row">
+                    <a>Зацвёл редкий цветок</a>
+                </li>
+                <li class="w3-row">
+                    <a>Требуется помощь в уборке сада</a>
+                </li>
+                <li class="w3-row">
+                    <a>Открыт набор на курсы флористов</a>
+                </li>
+            </ul>
+        </div>
+    </aside>
+
+    <footer class="w3-section w3-col w3-theme-d2 w3-display-container">
+        <nav class="w3-col l2 w3-bar-block w3-margin">
+            <a class="w3-block" href="/index">Главная</a>
+            <a class="w3-block" href="/catalog">Каталог</a>
+            <a class="w3-block w3-margin-left" href="/catalog/scientific">Научная классификация</a>
+            <a class="w3-block w3-margin-left" href="/catalog/lifeform">По жизненной форме</a>
+            <a class="w3-block w3-margin-left" href="">По времени цветения</a>
+            <a class="w3-block" href="/calendar">Календарь цветения</a>
+            <a class="w3-block" href="/news">Архив новостей</a>
+        </nav>
+        <div class="w3-col l9 w3-center w3-section">
+            <img src="/images/foto.jpg" class="" alt="">
+            <p class="w3-text-light-gray">
+                Сайт поддерживается и развивается Ростовским ботаническим садом • 2020 г.
+            </p>
+        </div>
+        <img src="/images/logo.png" class="logo w3-display-right">
+    </footer>
+</body>
+
+</html>
