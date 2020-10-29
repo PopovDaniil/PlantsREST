@@ -10,7 +10,9 @@
     <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
     <link rel="shortcut icon" href="icons/icon192.png" type="image/png">
     <link rel="manifest" href="manifest.webmanifest">
-    <script src="javascripts/utils.js"></script>
+    <script src="javascripts/user.js"></script>
+    <script src="javascripts/model.js"></script>
+    <script src="javascripts/main.js"></script>
     <title>Document</title>
 </head>
 
@@ -51,16 +53,7 @@
     </menu>
 
     <h2>Главная</h2>
-    <div class="flex-container">
-        {{#each blocks}}
-        <div class="w3-padding w3-half">
-            <section class="w3-card-4 w3-container w3-theme w3-margin-top">
-                <img src="/images/{{LatinName}}.jpg" alt="" class="w3-col small w3-left-align w3-margin">
-                <a class="w3-xlarge" href="/catalog/{{LatinName}}">{{Name}}</a>
-                <p class="w3-small">{{Description}}
-            </section>
-        </div>
-        {{/each}}
+    <div class="flex-container" id="randomCards">
     </div>
 
     <aside class="w3-container w3-col s6 m3 l3">
