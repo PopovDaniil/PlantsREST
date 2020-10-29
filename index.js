@@ -23,7 +23,7 @@ fastify.route({
     }
 })
 
-fastify.listen(PORT, (err,address) => {
+fastify.listen(PORT,"0.0.0.0", (err,address) => {
     console.error(PORT);
     fastify.log.info(`server listening on ${address}`)
 })
