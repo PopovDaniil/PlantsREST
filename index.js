@@ -6,6 +6,8 @@ const fastify = require("fastify").fastify({
 const static = require("fastify-static");
 const db = require("./db");
 
+const PORT = process.env.PORT || 3000;
+
 fastify.register(static, {
     root: path.join(__dirname,'public'),
     prefix: "/"
@@ -21,7 +23,7 @@ fastify.route({
     }
 })
 
-fastify.listen(3000, (err,address) => {
+fastify.listen(PORT, (err,address) => {
     if (err) {
         fastify.log.error(err);
         process.exit(1);
