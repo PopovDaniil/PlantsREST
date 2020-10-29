@@ -1,5 +1,5 @@
 const path = require("path");
-const fs = require("fs/promises");
+const fs = require("fs");
 const fastify = require("fastify").fastify({
     logger: true
 });
@@ -17,7 +17,7 @@ fastify.route({
     method: "GET",
     url: '/',
     handler: async (req,res) => {
-        const index = await fs.readFile("./public/index.html");
+        const index = fs.readFileSync("./public/index.html");
         res.header("Content-type","text/html");
         res.send(index);
     }
