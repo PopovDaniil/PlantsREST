@@ -1,5 +1,5 @@
 window.onload = () => {
-    randomCards(model,"#randomCards",6);
+    randomCards(model,"#randomCards",6,);
 }
 /**
  * 
@@ -18,6 +18,17 @@ function card(name, latinName, description) {
     </div>
     `
 }
+/**
+ * 
+ * @param {string} content
+ * @param {string[]} classes 
+ */
+function div(content,classes) {
+    return `
+    <div class=${classes}>
+        ${content}
+    </div>`
+}
 
 function randint(min, max) {
     const r = Math.random();
@@ -29,9 +40,11 @@ function randint(min, max) {
  * @param {Array} model 
  * @param {String} selector 
  * @param {Number} number 
+ * @param {String} classes
  */
-function randomCards(model, selector, number) {
+function randomCards(model, selector, number,classes = "") {
     const root = document.querySelector(selector);
+    root.className = classes;
     for (let i = 0; i < number; i++) {
         const r = randint(0, model.length - 1);
         const crd = card(model[r].name,model[r].latinName,model[r].description);
