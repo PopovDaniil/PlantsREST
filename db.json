@@ -1,0 +1,14 @@
+{
+    "plants": [
+        {
+            "name": "Ромашка",
+            "latinName": "Chamomilla",
+            "description": "Травянистое растение"
+        },
+        {
+            "name": "Магнолия",
+            "latinName": "Magnolia",
+            "description": "Цветок"
+        }
+    ]
+}

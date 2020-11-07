@@ -12,6 +12,7 @@
   "dependencies": {
     "fastify": "^3.7.0",
     "fastify-cli": "^2.5.1",
-    "fastify-static": "^3.3.0"
+    "fastify-static": "^3.3.0",
+    "jquery": "^3.5.1"
   }
 }

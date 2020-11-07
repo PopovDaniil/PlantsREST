@@ -1,5 +1,6 @@
 window.onload = () => {
-    randomCards(model,"#randomCards",6,);
+    console.log(requestAPI("plants"));
+        randomCards(model,"#randomCards",6)
 }
 /**
  * 
@@ -10,7 +11,7 @@ window.onload = () => {
 function card(name, latinName, description) {
     return `
     <div class="w3-padding w3-half">
-            <section class="w3-card-4 w3-container w3-theme w3-margin-top">
+            <section class="w3-card-4 w3-container w3-theme w3-margin-top" style="height: 230px">
                 <img src="/images/${latinName.toLowerCase()}.jpg" alt="" class="w3-col small w3-left-align w3-margin">
                 <a class="w3-xlarge" href="/catalog/${latinName}">${name}</a>
                 <p class="w3-small">${description}
@@ -50,4 +51,10 @@ function randomCards(model, selector, number,classes = "") {
         const crd = card(model[r].name,model[r].latinName,model[r].description);
         root.insertAdjacentHTML("beforeend",crd);
     }
+}
+async function requestAPI(resource = "",options = {}) {
+    const response = await fetch("/api/" + resource, {
+        method: options.method || "GET",
+    })
+    return await response.json();
 }
