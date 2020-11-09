@@ -79,3 +79,7 @@ td[onclick] {
     flex-wrap: wrap;
     justify-content: center;
 }
+
+[data-resource] {
+    cursor: pointer;
+}
