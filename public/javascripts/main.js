@@ -1,34 +1,21 @@
-window.onload = async () => {
-    const plants = await requestAPI("plants");
-    randomCards(plants, "#content", 6);
-
-    document.querySelectorAll("[data-resource]").forEach(
-        link => link.onclick =
-            async event => {
-                event.preventDefault();
-                const content = await requestAPI(link.dataset["resource"]);
-                const main = document.querySelector("main");
-                main.innerHTML = plant(content.name, content.latinName, content.description);
-            }
-    )
-}
-/**
- * 
- * @param {String} name 
- * @param {String} latinName 
- * @param {String} description 
- */
-function card(name, latinName, description) {
-    return `
+window.onload = index;
+    /**
+     * 
+     * @param {String} name 
+     * @param {String} latinName 
+     * @param {String} description 
+     */
+    function card(name, latinName, description) {
+        return `
     <div class="w3-padding w3-half">
             <section class="w3-card-4 w3-container w3-theme w3-margin-top" style="height: 230px">
                 <img src="/images/${latinName.toLowerCase()}.jpg" alt="" class="w3-col small w3-left-align w3-margin">
-                <div class="w3-xlarge" data-resource="plants/${latinName.toLowerCase()}">${name}</a>
+                <a class="w3-xlarge" href="/plants/${latinName.toLowerCase()}">${name}</a>
                 <p class="w3-small">${description}
             </section>
     </div>
     `
-}
+    }
 
 function plant(name, latinName, description) {
     return `
@@ -44,6 +31,33 @@ function plant(name, latinName, description) {
 </div>
     `
 }
+
+async function index() {
+    const plants = await requestAPI("/plants");
+    randomCards(plants, "#content", 6);
+
+    document.querySelectorAll("a").forEach(
+        link => link.onclick = linkHandler
+    )
+
+}
+
+async function linkHandler(event) {
+    event.preventDefault();
+    const uri = this.pathname;
+    if (uri == "/") {
+        const indexHTML = `<h2>Главная</h2><div id="content"></div>`;
+        const $main = document.querySelector("main");
+        $main.innerHTML = "";
+        $main.insertAdjacentHTML("afterbegin", indexHTML);
+        index();
+    } else {
+        const content = await requestAPI(uri);
+        const main = document.querySelector("main");
+        main.innerHTML = plant(content.name, content.latinName, content.description);
+    }
+}
+
 function randint(min, max) {
     const r = Math.random();
     const l = r * (max - min) + min;
@@ -58,6 +72,7 @@ function randint(min, max) {
  */
 function randomCards(model, selector, number, classes = "") {
     const root = document.querySelector(selector);
+    if (!root) throw new Error("Root element doesn't exist");
     root.className = classes;
     for (let i = 0; i < number; i++) {
         const r = randint(0, model.length - 1);
@@ -65,9 +80,8 @@ function randomCards(model, selector, number, classes = "") {
         root.insertAdjacentHTML("beforeend", crd);
     }
 }
-
 async function requestAPI(resource = "", options = {}) {
-    const response = await fetch("/api/" + resource, {
+    const response = await fetch("/api" + resource, {
         method: options.method || "GET",
     })
     return await response.json();
