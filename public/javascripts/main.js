@@ -54,7 +54,7 @@ async function linkHandler(event) {
     } else {
         const content = await requestAPI(uri);
         const main = document.querySelector("main");
-        main.innerHTML = plant(content.name, content.latinName, content.description);
+        main.innerHTML = plant(content.Name, content.LatinName, content.Description);
     }
 }
 
@@ -76,7 +76,7 @@ function randomCards(model, selector, number, classes = "") {
     root.className = classes;
     for (let i = 0; i < number; i++) {
         const r = randint(0, model.length - 1);
-        const crd = card(model[r].name, model[r].latinName, model[r].description);
+        const crd = card(model[r].Name, model[r].LatinName, model[r].Description);
         root.insertAdjacentHTML("beforeend", crd);
     }
 }

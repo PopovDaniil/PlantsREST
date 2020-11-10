@@ -1,21 +1,46 @@
+const mariadb = require("mariadb");
+
 class Model {
     constructor() {
-        this.db = require("./db.json");
-        this.plants = new Plants(this.db.plants);
+        const PROD = Boolean(process.env.PORT);
+        const dbAddress = PROD ? process.env.JAWSDB_MARIA_URL.replace("mysql", "mariadb") : {
+            host: "localhost",
+            user: "daniil",
+            password: "12qw"
+        };
+        (async () => {
+            try {
+                this.db = await mariadb.createConnection(dbAddress)
+                    .catch(err => {
+                        throw new Error("MariaDB connection error:" + err.message)
+                    });
+                if (!PROD) this.db.query("USE catalog");
+            } catch (err) {
+                console.error(err);
+                process.exit(1);
+            }
+            this.plants = new Plants(this.db);
+        })()
     }
 }
 
 class Plants {
-    constructor(data = []) {
-        this.data = data;
+    /**
+     * 
+     * @param {import("mariadb").Connection} db 
+     */
+    constructor(db) {
+        this.data = db;
     }
-    get(latinName) {
+    /**
+     * 
+     * @param {String} latinName 
+     */
+    async get(latinName) {
         if (latinName) {
-            return this.data.filter(
-                item => item.latinName.toLowerCase() == latinName
-            )[0] || new Error(`Item ${latinName} not found`);
+            return (await this.data.query(`SELECT * FROM items WHERE LatinName='${latinName.toLowerCase()}'`))[0]
         } else {
-            return this.data;
+            return await this.data.query(`SELECT * FROM items`);
         }
     }
 }

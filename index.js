@@ -38,16 +38,16 @@ fastify
     .route({
         method: "GET",
         url: "/api/plants",
-        handler: (req,res) => {
-            const json = model.plants.get();
+        handler: async (req,res) => {
+            const json = await model.plants.get();
             res.send(json);
         }
     })
     .route({
         method: "GET",
         url: "/api/plants/:latin",
-        handler: (req,res) => {
-            const json = model.plants.get(req.params.latin);
+        handler: async (req,res) => {
+            const json = await model.plants.get(req.params.latin);
             res.send(json);
         },
         errorHandler: onNotFound
