@@ -26,7 +26,6 @@ class Model {
 
 class Plants {
     /**
-     * 
      * @param {import("mariadb").Connection} db 
      */
     constructor(db) {
@@ -34,7 +33,7 @@ class Plants {
     }
     /**
      * 
-     * @param {String} latinName 
+     * @param {String} latinName
      */
     async get(latinName) {
         if (latinName) {
@@ -43,5 +42,15 @@ class Plants {
             return await this.data.query(`SELECT * FROM items`);
         }
     }
+
+    async set(name,latinName,description) {
+        const exist = await this.get(latinName);
+        if (exist) {
+            return await this.data.query(`UPDATE items SET Name='${name}',Description='${description}' WHERE LatinName='${latinName.toLowerCase()}'`)
+        } else {
+            return await this.data.query(`INSERT INTO items (Name,LatinName,Description) VALUES ('${name}','${latinName}','${description}');`)
+        }
+    }
+
 }
 module.exports = Model;

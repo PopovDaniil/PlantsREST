@@ -52,6 +52,15 @@ fastify
         },
         errorHandler: onNotFound
     })
+    .route({
+        method: "POST",
+        url: "/api/plants/:latin",
+        handler: async (req,res) => {
+            const body = JSON.parse(req.body);
+            const status = await model.plants.set(body.Name,body.LatinName,body.Description);
+            res.send(status);
+        }
+    })
     .listen(PORT, "0.0.0.0", (err, address) => {
         console.info(PORT);
         fastify.log.info(`server listening on ${address}`)
