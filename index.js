@@ -7,7 +7,12 @@ const static = require("fastify-static");
 const Model = require("./model");
 const model = new Model();
 
-const onNotFound = (err,req,res) => res.code(404).send(err);
+const onNotFound = (err, req, res) => res.code(404).send(err);
+const root = async (req, res) => {
+    const index = fs.readFileSync("./public/index.html");
+    res.header("Content-type", "text/html");
+    res.send(index);
+}
 
 const PORT = process.env.PORT || 3000;
 
@@ -19,11 +24,7 @@ fastify
     .route({
         method: "GET",
         url: '/',
-        handler: async (req, res) => {
-            const index = fs.readFileSync("./public/index.html");
-            res.header("Content-type", "text/html");
-            res.send(index);
-        }
+        handler: root
     })
     .route({
         method: "GET",
@@ -38,7 +39,7 @@ fastify
     .route({
         method: "GET",
         url: "/api/plants",
-        handler: async (req,res) => {
+        handler: async (req, res) => {
             const json = await model.plants.get();
             res.send(json);
         }
@@ -46,7 +47,7 @@ fastify
     .route({
         method: "GET",
         url: "/api/plants/:latin",
-        handler: async (req,res) => {
+        handler: async (req, res) => {
             const json = await model.plants.get(req.params.latin);
             res.send(json);
         },
@@ -55,11 +56,19 @@ fastify
     .route({
         method: "POST",
         url: "/api/plants/:latin",
-        handler: async (req,res) => {
+        handler: async (req, res) => {
             const body = JSON.parse(req.body);
-            const status = await model.plants.set(body.Name,body.LatinName,body.Description);
+            const status = await model.plants.set(body.Name, body.LatinName, body.Description);
             res.send(status);
         }
+    })
+    .route({
+        method: "GET",
+        url: "/plants/*",
+        handler: root
+    })
+    .addHook("onError", async (req, res, error) => {
+        console.error(error);
     })
     .listen(PORT, "0.0.0.0", (err, address) => {
         console.info(PORT);
