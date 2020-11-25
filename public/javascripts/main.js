@@ -72,6 +72,13 @@ class Views {
         /**@type {String} */
         const view = func(model);
         this.$root.innerHTML = view;
+        
+        document.querySelectorAll("a").forEach(
+            link => link.onclick = linkHandler
+        )
+        document.querySelectorAll("form").forEach(
+            form => form.onsubmit = formHandler
+        )
         return this;
     }
     /**
@@ -84,6 +91,56 @@ class Views {
             return this.views.get(id)(model);
         } else {
             return this.views;
+        }
+    }
+}
+
+class Router {
+    /**
+     * @type {Map<String|RegExp,Function<void>}
+     */
+    routes = new Map();
+    /**
+     * @type {Function<void>} Маршрут по умолчанию (срабатывает, если ни один не подошёл)
+     */
+    defaultRoute;
+    /**
+     * Добавляет маршрут в массив
+     * @param {String|RegExp} uri Путь
+     * @param {Function<String>} func Функция обработки маршрута
+     * @returns {Router} this
+     */
+    add(uri, func) {
+        this.routes.set(uri, func);
+        return this;
+    }
+    /**
+     * Устанавливает маршрут по умолчанию
+     * @param {Function<void>} func Обработчик маршрута по умолчанию
+     */
+    default(func) {
+        this.defaultRoute = func;
+    }
+    /**
+     * Вызывает функцию обработки маршрута, соответствующую пути
+     * @param {String} method Метод HTTP-запроса
+     * @param {String} path Запрашиваемый адрес
+     * @param {Boolean} fromHistory Был ли произведён переход по истории браузера, или же по ссылке
+    */
+    async request(method, path, fromHistory) {
+        $main.innerHTML = "";
+        let routeExists = false;
+        this.routes.forEach((func, uri) => {
+            if ((uri instanceof RegExp && path.match(uri)) || path == uri) {
+                    func(method, path);
+                    routeExists = true;
+            }
+        })
+        if (!routeExists) {
+            this.defaultRoute?.();
+        }
+        if (!fromHistory && path != history.state?.path) {
+            window.history.pushState({ path: path }, document.title, path);
         }
     }
 }
@@ -140,33 +197,66 @@ catalogViews.add("list", catalog => {
     })
     return html;
 })
+
+const router = new Router();
+router
+    .add("/", () => {
+        index({}, true);
+        document.title = "Главная";
+    })   
+    .add(/plants\/.*/, async (method, uri) => {
+        const content = await requestAPI(uri, { method: method });
+        console.log(content);
+        const plant = new Plant(content.Name, content.LatinName, content.Description, plantViews);
+        plant.insert("plant");
+        document.title = content.Name;
+    })
+    .add(/plants\/.*\?edit/, async (method, uri) => {
+        const content = await requestAPI(uri);
+        const plant = new Plant(content.Name, content.LatinName, content.Description, plantViews);
+        plant.insert("edit");
+        document.title = `Редактирование ${content.Name}`;
+    })
+    .add("/catalog",async () =>{
+        const content = await requestAPI("/plants");
+        catalogViews.insert("list",content);
+    })
+    .default(() => {
+        console.log("Not found");
+    })
+console.log(router.routes);
+
 /**
- * @var {HTMLElement} Элемент, в который будут вставляться представления
+ * @type {HTMLElement} Элемент, в который будут вставляться представления
  */
 let $main;
+/**
+ * @type {Boolean} Является ли открытие страницы первым в этой сессии
+ */
 let firstEntry = false;
 
 document.addEventListener("DOMContentLoaded", () => {
     $main = document.querySelector("main");
 
     const path = location.pathname + location.search;
-    router("GET", path, firstEntry);
+    router.request("GET", path);
+
     console.log(path);
     firstEntry = true;
 });
 window.onpopstate = () => {
-    router("GET", history.state.uri, true);
+    router.request("GET", history.state.path, true);
 }
 /**
  * @param {Boolean} transitted Был ли совершён пользователем переход на главную или она открылась прии заходе на сайт
  */
 async function index(event, transitted) {
-/**
- * Вставляет указанное количество карточек случайных растений
- * @param {Array} model Каталог
- * @param {String} selector Селектор места вставки
- * @param {Number} number Количество генерируемых карточек
- */
+    /**
+     * Вставляет указанное количество карточек случайных растений
+     * @param {Array} model Каталог
+     * @param {String} selector Селектор места вставки
+     * @param {Number} number Количество генерируемых карточек
+     */
     function randomCards(model, selector, number, view) {
         const root = document.querySelector(selector);
         if (!root) throw new Error("Root element doesn't exist");
@@ -193,43 +283,9 @@ async function index(event, transitted) {
     document.querySelectorAll("a").forEach(
         link => link.onclick = linkHandler
     );
-    document.title = "Главная";
     if (!transitted) {
         window.history.replaceState({ uri: "/" }, document.title, "/");
     }
-}
-/**
- * Вставляет в root содержимое, соответвующее указанному адресу, запрашивая данные с сервера
- * @param {String} method Метод HTTP-запроса
- * @param {String} uri Запрашиваемый адрес
- * @param {Boolean} inHistory Был ли произведён переход по истории браузера
- */
-async function router(method, uri, inHistory) {
-    let title;
-    $main.innerHTML = "";
-    if (uri == "/") {
-        index({}, true);
-    } else if (uri.endsWith("edit")) {
-        const content = await requestAPI(uri);
-        const plant = new Plant(content.Name, content.LatinName, content.Description, plantViews);
-        plant.insert("edit");
-        title = `Редактирование ${content.Name}`
-    } else if (uri == "/catalog") {
-        const catalog = await requestAPI("/plants");
-        catalogViews.insert("list",catalog);
-        title = "Каталог";
-    } else {
-        const content = await requestAPI(uri, { method: method });
-        console.log(content);
-        title = content.Name;
-        const plant = new Plant(content.Name, content.LatinName, content.Description, plantViews);
-        plant.insert("plant");
-    }
-
-    if (!inHistory && uri != history.state?.uri) {
-        window.history.pushState({ uri: uri }, title, uri);
-    }
-    document.title = title;
 }
 
 /**
@@ -243,14 +299,7 @@ async function linkHandler(event) {
     const params = this.search;
     const method = this.dataset["action"];
 
-    await router(method, uri + params, false)
-
-    document.querySelectorAll("a").forEach(
-        link => link.onclick = linkHandler
-    )
-    document.querySelectorAll("form").forEach(
-        form => form.onsubmit = formHandler
-    )
+    await router.request(method, uri + params, false)
 }
 /**
  * 

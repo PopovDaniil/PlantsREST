@@ -3,7 +3,7 @@
     "short_name": "Plants",
     "start_url": "/",
     "description": "Энциклопедия растений",
-    "display": "fullscreen",
+    "display": "minimal-ui",
     "background_color": "#3d8b40",
     "theme_color": "#3d8b40",
     "icons": [
