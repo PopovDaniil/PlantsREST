@@ -62,13 +62,14 @@ fastify
             res.send(status);
         }
     })
-    .route({
-        method: "GET",
-        url: "/plants/*",
-        handler: root
-    })
     .addHook("onError", async (req, res, error) => {
         console.error(error);
+    })
+    .addHook("preHandler",(req,res,done) => {
+        if (req.is404) {
+            root(req,res);
+        }
+        done();
     })
     .listen(PORT, "0.0.0.0", (err, address) => {
         console.info(PORT);
