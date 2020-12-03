@@ -14,7 +14,6 @@
     "fastify-cli": "^2.5.1",
     "fastify-static": "^3.3.0",
     "jquery": "^3.5.1",
-    "mariadb": "^2.5.1",
-    "parcel-bundler": "^1.12.4"
+    "mariadb": "^2.5.1"
   }
 }
