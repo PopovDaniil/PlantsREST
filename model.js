@@ -51,6 +51,8 @@ class Plants {
             return await this.data.query(`INSERT INTO items (Name,LatinName,Description) VALUES ('${name}','${latinName}','${description}');`)
         }
     }
-
+    async delete(latinName) {
+        return await this.data.query(`DELETE FROM items WHERE LatinName='${latinName.toLowerCase()}'`)
+    }
 }
 module.exports = Model;

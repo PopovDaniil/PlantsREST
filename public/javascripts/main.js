@@ -65,14 +65,14 @@ class Views {
      * Вставляет представление, сгенерированное функцией представления
      * @param {String} id Идентификатор представления
      * @param {PlantModel} model Растение
-     * @returns {ThisType<Views>} this
+     * @returns {Views} this
      */
     insert(id, model) {
         const func = this.views.get(id);
         /**@type {String} */
         const view = func(model);
         this.$root.innerHTML = view;
-        
+
         document.querySelectorAll("a").forEach(
             link => link.onclick = linkHandler
         )
@@ -126,14 +126,15 @@ class Router {
      * @param {String} method Метод HTTP-запроса
      * @param {String} path Запрашиваемый адрес
      * @param {Boolean} fromHistory Был ли произведён переход по истории браузера, или же по ссылке
+     * @param {Object=} data Необязательные данные, передаваемые обработчику
     */
-    async request(method, path, fromHistory) {
-        $main.innerHTML = "";
+    async request(method, path, fromHistory, data) {
+        if (method == "GET") $main.innerHTML = "";
         let routeExists = false;
         this.routes.forEach((func, uri) => {
             if ((uri instanceof RegExp && path.match(uri)) || path == uri) {
-                    func(method, path);
-                    routeExists = true;
+                func(method, path, data);
+                routeExists = true;
             }
         })
         if (!routeExists) {
@@ -192,7 +193,7 @@ catalogViews.add("list", catalog => {
         <span class="name">${item.Name}(${item.LatinName})</span><br>
         <p>${item.Description}</p>
         <a href="/plants/${item.LatinName}?edit" class="underline">Редактировать</a>
-        <a onclick="deleteItem(${item.LatinName})" class="underline">Удалить</a>
+        <a data-method="DELETE" data-action="/plants/${item.LatinName}" class="underline">Удалить</a>
         <hr>`
     })
     return html;
@@ -203,13 +204,21 @@ router
     .add("/", () => {
         index({}, true);
         document.title = "Главная";
-    })   
-    .add(/plants\/.*/, async (method, uri) => {
-        const content = await requestAPI(uri, { method: method });
-        console.log(content);
-        const plant = new Plant(content.Name, content.LatinName, content.Description, plantViews);
-        plant.insert("plant");
-        document.title = content.Name;
+    })
+    .add(/plants\/.*/, async (method, uri, data) => {
+        if (method == "GET") {
+            const content = await requestAPI(uri, { method: method });
+            console.log(content);
+            const plant = new Plant(content.Name, content.LatinName, content.Description, plantViews);
+            plant.insert("plant");
+            document.title = content.Name;
+        } else if (method == "POST" || method == "DELETE") {
+            const response = await requestAPI(uri, {
+                method,
+                data: JSON.stringify(data)
+            })
+            console.log(response);
+        }
     })
     .add(/plants\/.*\?edit/, async (method, uri) => {
         const content = await requestAPI(uri);
@@ -217,9 +226,9 @@ router
         plant.insert("edit");
         document.title = `Редактирование ${content.Name}`;
     })
-    .add("/catalog",async () =>{
+    .add("/catalog", async () => {
         const content = await requestAPI("/plants");
-        catalogViews.insert("list",content);
+        catalogViews.insert("list", content);
     })
     .default(() => {
         console.log("Not found");
@@ -230,10 +239,6 @@ console.log(router.routes);
  * @type {HTMLElement} Элемент, в который будут вставляться представления
  */
 let $main;
-/**
- * @type {Boolean} Является ли открытие страницы первым в этой сессии
- */
-let firstEntry = false;
 
 document.addEventListener("DOMContentLoaded", () => {
     $main = document.querySelector("main");
@@ -242,7 +247,6 @@ document.addEventListener("DOMContentLoaded", () => {
     router.request("GET", path);
 
     console.log(path);
-    firstEntry = true;
 });
 window.onpopstate = () => {
     router.request("GET", history.state.path, true);
@@ -295,10 +299,10 @@ async function index(event, transitted) {
  */
 async function linkHandler(event) {
     event.preventDefault();
-    const uri = this.pathname;
+    const uri = this.dataset["action"] || this.pathname;
     const params = this.search;
-    const method = this.dataset["action"];
-
+    const method = this.dataset["method"] || "GET";
+    
     await router.request(method, uri + params, false)
 }
 /**
@@ -319,11 +323,7 @@ async function formHandler(event) {
         };
     } else throw new Error("Unknown resource type");
 
-    const response = await requestAPI(resource, {
-        method: "POST",
-        data: JSON.stringify(data)
-    })
-    console.log(response);
+    router.request("POST", resource, false, data);
 }
 
 async function requestAPI(resource = "", options = {}) {

@@ -64,7 +64,7 @@ a {
 .padding-child *{
     padding: 3px;
 }
-*[onclick] {
+*[onclick], *[data-action] {
     cursor: pointer;
 }
 td[onclick] {

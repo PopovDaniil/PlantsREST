@@ -54,6 +54,15 @@ fastify
         errorHandler: onNotFound
     })
     .route({
+        method: "DELETE",
+        url: "/api/plants/:latin",
+        handler: async (req, res) => {
+            const json = await model.plants.delete(req.params.latin);
+            res.send(json);
+        },
+        errorHandler: onNotFound
+    })
+    .route({
         method: "POST",
         url: "/api/plants/:latin",
         handler: async (req, res) => {
