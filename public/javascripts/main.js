@@ -217,6 +217,7 @@ router
                 method,
                 data: JSON.stringify(data)
             })
+            router.request("GET", uri)
             console.log(response);
         }
     })
