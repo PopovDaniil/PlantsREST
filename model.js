@@ -47,7 +47,7 @@ class Plants {
         if (exist) {
             return await this.data.query(`UPDATE items SET Name='${name}',Description='${description}' WHERE LatinName='${latinName.toLowerCase()}'`)
         } else {
-            return await this.data.query(`INSERT INTO items (Name,LatinName,Description) VALUES ('${name}','${latinName}','${description}');`)
+            return await this.data.query(`INSERT INTO items (Name,LatinName,Description) VALUES ('${name}','${latinName.toLowerCase()}','${description}');`)
         }
     }
     async delete(latinName) {
