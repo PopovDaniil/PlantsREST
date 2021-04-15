@@ -171,14 +171,14 @@ plantViews
     <a href="/plants/${latinName}?edit">Редактировать</a>
 </div>`
     })
-    .add("edit", ({ name, latinName, description }) => {
+    .add("edit", ({ name, latinName, description } = {}) => {
         const newElement = !(name || latinName || description);
         return `
-    <h2>${newElement ? "Создание" : "Изменение"} элемента</h2>
-    <form method="POST" action="/plants/${latinName}" >
-        Название: <input type="text" name="name" value="${name}" required maxlength="100"><br>
-        Латинское название: <input type="text" name="latin" value="${latinName}" ${newElement ? "readonly" : ""} required maxlength="100"><br>
-        Описание: <br> <textarea name="description" cols="30" rows="10" required>${description}</textarea><br>
+    <h2>${newElement ? "Создание" : "Изменение"} растения</h2>
+    <form method="POST" action="/plants${newElement ? '?add' : '/latinName'}">
+        Название: <input type="text" name="name" value="${name ?? ""}" required maxlength="100"><br>
+        Латинское название: <input type="text" name="latin" value="${latinName ?? ""}" ${newElement ? "" : "readonly"} required maxlength="100"><br>
+        Описание: <br> <textarea name="description" cols="30" rows="10" required>${description ?? ""}</textarea><br>
         <input type="submit" value="Записать">
     </form>
 `
@@ -187,13 +187,15 @@ console.log(plantViews.views);
 
 const catalogViews = new Views("main");
 catalogViews.add("list", catalog => {
-    let html = "<h2>Редактирование каталога</h2>";
+    let html = "<h2>Редактирование каталога</h2><p><a href='/plants?add'>Добавить растение</a></p>";
     catalog.forEach(item => {
         html += `
-        <span class="name">${item.Name}(${item.LatinName})</span><br>
+        <div>
+        <a href='/plants/${item.LatinName}' class="name">${item.Name}(${item.LatinName})</a><br>
         <p>${item.Description}</p>
         <a href="/plants/${item.LatinName}?edit" class="underline">Редактировать</a>
         <a data-method="DELETE" data-action="/plants/${item.LatinName}" class="underline">Удалить</a>
+        </div>
         <hr>`
     })
     return html;
@@ -217,8 +219,21 @@ router
                 method,
                 data: JSON.stringify(data)
             })
-            router.request("GET", uri)
             console.log(response);
+        }
+    })
+    .add(/plants\?add/, async () => {
+        plantViews.insert('edit');
+        document.title = "Создание растения";
+    })
+    .add(/plants/, async (method, uri, data) => {
+        if (method == 'POST') {
+            const response = await requestAPI(`/plants/${data.latinName}`, {
+                method: 'POST',
+                data: JSON.stringify(data)
+            })
+            console.log(response);
+            router.request('GET','/catalog')
         }
     })
     .add(/plants\/.*\?edit/, async (method, uri) => {
@@ -262,7 +277,7 @@ async function index(event, transitted) {
      * @param {String} selector Селектор места вставки
      * @param {Number} number Количество генерируемых карточек
      */
-    function randomCards(model, selector, number, view) {
+    function randomCards(model, selector, number) {
         const root = document.querySelector(selector);
         if (!root) throw new Error("Root element doesn't exist");
         for (let i = 0; i < number; i++) {
@@ -303,7 +318,7 @@ async function linkHandler(event) {
     const uri = this.dataset["action"] || this.pathname;
     const params = this.search;
     const method = this.dataset["method"] || "GET";
-    
+
     await router.request(method, uri + params, false)
 }
 /**
