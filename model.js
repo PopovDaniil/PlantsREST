@@ -5,8 +5,7 @@ class Model {
         const PROD = Boolean(process.env.PORT);
         const dbAddress = PROD ? process.env.JAWSDB_MARIA_URL.replace("mysql", "mariadb") : {
             host: "localhost",
-            user: "daniil",
-            password: "12qw"
+            user: "daniil" 
         };
         (async () => {
             try {
