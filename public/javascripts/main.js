@@ -154,7 +154,7 @@ plantViews
             <section class="w3-card-4 w3-container w3-theme w3-margin-top" style="height: 230px">
                 <img src="/images/${latinName.toLowerCase()}.jpg" alt="" class="w3-col small w3-left-align w3-margin">
                 <a class="w3-xlarge" href="/plants/${latinName.toLowerCase()}">${name}</a>
-                <p class="w3-small">${description}
+                <p class="w3-small description">${description}
             </section>
     </div>`
     })
@@ -220,6 +220,7 @@ router
                 data: JSON.stringify(data)
             })
             console.log(response);
+            router.request("GET","/catalog")
         }
     })
     .add(/plants\?add/, async () => {

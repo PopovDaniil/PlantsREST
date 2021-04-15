@@ -83,3 +83,11 @@ td[onclick] {
 [data-resource] {
     cursor: pointer;
 }
+
+.description {
+        -webkit-line-clamp: 8;
+        text-overflow: ellipsis;
+        overflow: hidden;
+        display: -webkit-box;
+        -webkit-box-orient: vertical;
+}
