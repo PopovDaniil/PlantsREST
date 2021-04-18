@@ -40,7 +40,10 @@ fastify
         method: "GET",
         url: "/api/plants",
         handler: async (req, res) => {
-            const json = await model.plants.get();
+            console.log(req.query);
+            const json = await model.plants.get({
+                description: req.query.search
+            });
             res.send(json);
         }
     })
@@ -48,7 +51,9 @@ fastify
         method: "GET",
         url: "/api/plants/:latin",
         handler: async (req, res) => {
-            const json = await model.plants.get(req.params.latin);
+            const json = await model.plants.get({
+                latinName: req.params.latin
+            });
             res.send(json);
         },
         errorHandler: onNotFound

@@ -129,6 +129,7 @@ class Router {
      * @param {Object=} data Необязательные данные, передаваемые обработчику
     */
     async request(method, path, fromHistory, data) {
+        method = method.toUpperCase();
         if (method == "GET") $main.innerHTML = "";
         let routeExists = false;
         this.routes.forEach((func, uri) => {
@@ -187,7 +188,8 @@ console.log(plantViews.views);
 
 const catalogViews = new Views("main");
 catalogViews.add("list", catalog => {
-    let html = "<h2>Редактирование каталога</h2><p><a href='/plants?add'>Добавить растение</a></p>";
+    let html = `<h2>${catalog[0] ? 'Редактирование каталога' : "Не найдено"}</h2>
+                <p><a href='/plants?add'>Добавить растение</a></p>`;
     catalog.forEach(item => {
         html += `
         <div>
@@ -220,12 +222,17 @@ router
                 data: JSON.stringify(data)
             })
             console.log(response);
-            router.request("GET","/catalog")
+            router.request("GET", "/catalog")
         }
     })
     .add(/plants\?add/, async () => {
         plantViews.insert('edit');
         document.title = "Создание растения";
+    })
+    .add(/plants\?search=/, async (method, uri) => {
+        const response = await requestAPI(uri);
+        console.log(response);
+        catalogViews.insert('list', response)
     })
     .add(/plants/, async (method, uri, data) => {
         if (method == 'POST') {
@@ -234,7 +241,11 @@ router
                 data: JSON.stringify(data)
             })
             console.log(response);
-            router.request('GET','/catalog')
+            router.request('GET', '/catalog')
+        } else if (method == 'GET' && data) {
+            const response = await requestAPI(`${uri}?search=${data.search}`);
+            console.log(response);
+            catalogViews.insert('list', response)
         }
     })
     .add(/plants\/.*\?edit/, async (method, uri) => {
@@ -329,18 +340,26 @@ async function linkHandler(event) {
  */
 async function formHandler(event) {
     event.preventDefault();
-    const resource = new URL(this.action).pathname
-    const type = resource.split("/")[1];
+    const resource = new URL(this.action).pathname,
+        type = resource.split("/")[1],
+        method = this.method;
+
     let data = {};
     if (type == "plants") {
-        data = {
-            Name: this[0].value,
-            LatinName: this[1].value.toLowerCase(),
-            Description: this[2].value
-        };
+        if (this['search']) {
+            data = {
+                search: this['search'].value
+            }
+        } else {
+            data = {
+                Name: this['name'].value,
+                LatinName: this['latin'].value.toLowerCase(),
+                Description: this['description'].value
+            };
+        }
     } else throw new Error("Unknown resource type");
 
-    router.request("POST", resource, false, data);
+    router.request(method, resource, false, data);
 }
 
 async function requestAPI(resource = "", options = {}) {

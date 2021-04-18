@@ -30,6 +30,15 @@ function copy() {
   setTimeout(() => x.innerHTML = t,2000);
 }
 
+/* document.querySelectorAll('form').forEach(
+  form => form.onsubmit = () => false
+) */
+
+function search(event) {
+  if (event.key == "Enter") {
+    
+  }
+}
 async function deleteItem(latin) {
   await fetch(`/catalog/${latin}`,{method: "DELETE"}).then(location.reload());
 }

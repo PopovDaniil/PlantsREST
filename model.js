@@ -34,10 +34,15 @@ class Plants {
      * 
      * @param {String} latinName
      */
-    async get(latinName) {
-        if (latinName) {
+    async get({latinName,description} = {}) {
+        console.log(latinName, description);
+        if (latinName && !description) {
             return (await this.data.query(`SELECT * FROM items WHERE LatinName='${latinName.toLowerCase()}'`))[0]
-        } else {
+        } 
+        else if (description) {
+            return await this.data.query(`SELECT * FROM items WHERE Description like '%${description}%' or LatinName like '%${description}%' or Name like '%${description}%'`)
+        }
+        else {
             return await this.data.query(`SELECT * FROM items`);
         }
     }
