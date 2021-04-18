@@ -175,7 +175,7 @@ plantViews
         const newElement = !(name || latinName || description);
         return `
     <h2>${newElement ? "Создание" : "Изменение"} растения</h2>
-    <form method="POST" action="/plants${newElement ? '?add' : '/latinName'}">
+    <form method="POST" action="/plants">
         Название: <input type="text" name="name" value="${name ?? ""}" required maxlength="100"><br>
         Латинское название: <input type="text" name="latin" value="${latinName ?? ""}" ${newElement ? "" : "readonly"} required maxlength="100"><br>
         Описание: <br> <textarea name="description" cols="30" rows="10" required>${description ?? ""}</textarea><br>
