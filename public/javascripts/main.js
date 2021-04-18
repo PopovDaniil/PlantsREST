@@ -330,7 +330,7 @@ async function linkHandler(event) {
 async function formHandler(event) {
     event.preventDefault();
     const resource = new URL(this.action).pathname
-    type = resource.split("/")[1];
+    const type = resource.split("/")[1];
     let data = {};
     if (type == "plants") {
         data = {
