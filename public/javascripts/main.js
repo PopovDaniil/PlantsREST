@@ -8,10 +8,11 @@ class Plant {
     * @param {String} description Описание
     * @param {Views} views Ссылка на коллекцию представлений
     */
-    constructor(name, latinName, description, views) {
+    constructor(name, latinName, description, tags, views) {
         this.name = name;
         this.latinName = latinName;
         this.description = description;
+        this.tags = tags;
         this.views = views;
     }
     /**
@@ -172,14 +173,15 @@ plantViews
     <a href="/plants/${latinName}?edit">Редактировать</a>
 </div>`
     })
-    .add("edit", ({ name, latinName, description } = {}) => {
-        const newElement = !(name || latinName || description);
+    .add("edit", ({ name, latinName, description, tags } = {}) => {
+        const newElement = !(name || latinName || description || tags);
         return `
     <h2>${newElement ? "Создание" : "Изменение"} растения</h2>
     <form method="POST" action="/plants">
         Название: <input type="text" name="name" value="${name ?? ""}" required maxlength="100"><br>
         Латинское название: <input type="text" name="latin" value="${latinName ?? ""}" ${newElement ? "" : "readonly"} required maxlength="100"><br>
         Описание: <br> <textarea name="description" cols="30" rows="10" required>${description ?? ""}</textarea><br>
+        Теги: <input type="text" name="tags" value="${tags ?? ""}" required maxlength="150"><br>
         <input type="submit" value="Записать">
     </form>
 `
@@ -245,7 +247,7 @@ router
         if (method == "GET") {
             const content = await requestAPI(uri, { method: method });
             console.log(content);
-            const plant = new Plant(content.Name, content.LatinName, content.Description, plantViews);
+            const plant = new Plant(content.Name, content.LatinName, content.Description, content.Tags, plantViews);
             plant.insert("plant");
             document.title = content.Name;
         } else if (method == "POST" || method == "DELETE") {
@@ -282,7 +284,7 @@ router
     })
     .add(/plants\/.*\?edit/, async (method, uri) => {
         const content = await requestAPI(uri);
-        const plant = new Plant(content.Name, content.LatinName, content.Description, plantViews);
+        const plant = new Plant(content.Name, content.LatinName, content.Description, content.Tags, plantViews);
         plant.insert("edit");
         document.title = `Редактирование ${content.Name}`;
     })
@@ -327,7 +329,7 @@ async function index(event, transitted) {
         if (!root) throw new Error("Root element doesn't exist");
         for (let i = 0; i < number; i++) {
             const r = randint(0, model.length - 1);
-            const item = new Plant(model[r].Name, model[r].LatinName, model[r].Description, plantViews);
+            const item = new Plant(model[r].Name, model[r].LatinName, model[r].Description, model[r].Tags, plantViews);
             const crd = item.get("card");
             root.insertAdjacentHTML("beforeend", crd);
         }
@@ -387,7 +389,8 @@ async function formHandler(event) {
             data = {
                 Name: this['name'].value,
                 LatinName: this['latin'].value.toLowerCase(),
-                Description: this['description'].value
+                Description: this['description'].value,
+                Tags: this['tags'].value
             };
         }
     } else throw new Error("Unknown resource type");

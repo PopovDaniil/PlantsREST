@@ -73,7 +73,7 @@ fastify
         url: "/api/plants/:latin",
         handler: async (req, res) => {
             const body = JSON.parse(req.body);
-            const status = await model.plants.set(body.Name, body.LatinName, body.Description);
+            const status = await model.plants.set(body.Name, body.LatinName, body.Description, body.Tags);
             res.send(status);
         }
     })
