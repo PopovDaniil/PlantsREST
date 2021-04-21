@@ -186,8 +186,8 @@ plantViews
     })
 console.log(plantViews.views);
 
-const catalogViews = new Views("main");
-catalogViews.add("list", catalog => {
+const catalogViews = new Views("main")
+.add("edit", catalog => {
     let html = `<h2>${catalog[0] ? 'Редактирование каталога' : "Не найдено"}</h2>
                 <p><a href='/plants?add'>Добавить растение</a></p>`;
     catalog.forEach(item => {
@@ -201,6 +201,38 @@ catalogViews.add("list", catalog => {
         <hr>`
     })
     return html;
+})
+.add("list", () => {
+    return `<div class="w3-right"><a href="?edit">Редактировать</a></div>
+    <div class="w3-row-padding w3-section">
+    <div class="w3-third">
+        <h2 class="w3-text-theme w3-center">Научная классификация</h2>
+        <section class="w3-card-4 w3-bar-block w3-theme w3-margin-top">
+            <a class="w3-bar-item w3-button" href="plants?tag=водоросли">Водоросли</a>
+            <a class="w3-bar-item w3-button" href="plants?tag=мхи">Мхи</a>
+            <a class="w3-bar-item w3-button" href="plants?tag=хвойные">Хвойные</a>
+            <a class="w3-bar-item w3-button" href="plants?tag=цветковые">Цветковые</a>
+        </section>
+    </div>
+    <div class="w3-third">
+        <h2 class="w3-text-theme w3-center">По жизненной форме</h2>
+        <section class="w3-card-4 w3-bar-block w3-theme w3-margin-top">
+            <a class="w3-bar-item w3-button" href="plants?tag=травы">Травы</a>
+            <a class="w3-bar-item w3-button" href="plants?tag=кустарники">Кустарники</a>
+            <a class="w3-bar-item w3-button" href="plants?tag=деревья">Деревья</a>
+            <a class="w3-bar-item w3-button" href="plants?tag=лианы">Лианы</a>
+        </section>
+    </div>
+    <div class="w3-third">
+        <h2 class="w3-text-theme w3-center">По времени цветения</h2>
+        <section class="w3-card-4 w3-bar-block w3-theme w3-margin-top">
+            <a class="w3-bar-item w3-button w3-theme-d2" href="plants?tag=май">Май</a>
+            <a class="w3-bar-item w3-button" href="plants?tag=июнь">Июнь</a>
+            <a class="w3-bar-item w3-button" href="plants?tag=июль">Июль</a>
+            <a class="w3-bar-item w3-button" href="plants?tag=август">Август</a>
+        </section>
+    </div>
+</div>`
 })
 
 const router = new Router();
@@ -225,14 +257,14 @@ router
             router.request("GET", "/catalog")
         }
     })
-    .add(/plants\?add/, async () => {
+    .add("plants?add", async () => {
         plantViews.insert('edit');
         document.title = "Создание растения";
     })
-    .add(/plants\?search=/, async (method, uri) => {
+    .add(/plants\?(search|tag)=/, async (method, uri) => {
         const response = await requestAPI(uri);
         console.log(response);
-        catalogViews.insert('list', response)
+        catalogViews.insert('edit', response)
     })
     .add(/plants/, async (method, uri, data) => {
         if (method == 'POST') {
@@ -245,7 +277,7 @@ router
         } else if (method == 'GET' && data) {
             const response = await requestAPI(`${uri}?search=${data.search}`);
             console.log(response);
-            catalogViews.insert('list', response)
+            catalogViews.insert('edit', response)
         }
     })
     .add(/plants\/.*\?edit/, async (method, uri) => {
@@ -254,9 +286,10 @@ router
         plant.insert("edit");
         document.title = `Редактирование ${content.Name}`;
     })
-    .add("/catalog", async () => {
+    .add("/catalog", async () => catalogViews.insert("list"))
+    .add("/catalog?edit", async () => {
         const content = await requestAPI("/plants");
-        catalogViews.insert("list", content);
+        catalogViews.insert("edit", content);
     })
     .default(() => {
         console.log("Not found");

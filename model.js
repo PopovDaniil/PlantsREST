@@ -34,25 +34,27 @@ class Plants {
      * 
      * @param {String} latinName
      */
-    async get({latinName,description} = {}) {
-        console.log(latinName, description);
-        if (latinName && !description) {
+    async get({latinName,description, tag} = {}) {
+        if (latinName && !description && !tag) {
             return (await this.data.query(`SELECT * FROM items WHERE LatinName='${latinName.toLowerCase()}'`))[0]
         } 
         else if (description) {
-            return await this.data.query(`SELECT * FROM items WHERE Description like '%${description}%' or LatinName like '%${description}%' or Name like '%${description}%'`)
+            return await this.data.query(`SELECT * FROM items WHERE Description LIKE '%${description}%' or LatinName LIKE '%${description}%' or Name LIKE '%${description}%'`)
+        }
+        else if (tag) {
+            return await this.data.query(`SELECT * FROM items WHERE Tags LIKE '% ${tag} %' OR Tags LIKE '${tag}' OR Tags Like '${tag} %' OR Tags Like '% ${tag}'`);
         }
         else {
             return await this.data.query(`SELECT * FROM items`);
         }
     }
 
-    async set(name,latinName,description) {
+    async set(name,latinName,description, tags) {
         const exist = await this.get(latinName);
         if (exist) {
-            return await this.data.query(`UPDATE items SET Name='${name}',Description='${description}' WHERE LatinName='${latinName.toLowerCase()}'`)
+            return await this.data.query(`UPDATE items SET Name='${name}',Description='${description}', Tags='${tags}' WHERE LatinName='${latinName.toLowerCase()}'`)
         } else {
-            return await this.data.query(`INSERT INTO items (Name,LatinName,Description) VALUES ('${name}','${latinName.toLowerCase()}','${description}');`)
+            return await this.data.query(`INSERT INTO items (Name,LatinName,Description, Tags) VALUES ('${name}','${latinName.toLowerCase()}','${description}', '${tags}');`)
         }
     }
     async delete(latinName) {

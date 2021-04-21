@@ -42,7 +42,8 @@ fastify
         handler: async (req, res) => {
             console.log(req.query);
             const json = await model.plants.get({
-                description: req.query.search
+                description: req.query.search,
+                tag: req.query.tag
             });
             res.send(json);
         }

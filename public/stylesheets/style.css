@@ -91,3 +91,8 @@ td[onclick] {
         display: -webkit-box;
         -webkit-box-orient: vertical;
 }
+
+.w3-row {
+    display: flex;
+    align-items: center;
+}
