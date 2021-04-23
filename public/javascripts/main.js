@@ -230,6 +230,7 @@ const catalogViews = new Views("main")
         <section class="w3-card-4 w3-bar-block w3-theme w3-margin-top">
             <a class="w3-bar-item w3-button w3-theme-d2" href="plants?tag=май">Май</a>
             <a class="w3-bar-item w3-button" href="plants?tag=июнь">Июнь</a>
+            
             <a class="w3-bar-item w3-button" href="plants?tag=июль">Июль</a>
             <a class="w3-bar-item w3-button" href="plants?tag=август">Август</a>
         </section>

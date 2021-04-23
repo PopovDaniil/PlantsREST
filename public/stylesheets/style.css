@@ -11,6 +11,7 @@ header {
 }
 menu {
     margin: 0px;
+    padding: 0;
 }
 @media (max-width: 993px) {
     aside {
@@ -25,6 +26,9 @@ menu {
     aside.show-sidebar {
         display: block;
     }
+    aside .w3-row, header>h1 {
+        flex-direction: column;
+    }
 }
 .back-black-opacity {
     background-color: rgba(0, 0, 0, 0.8);
@@ -38,7 +42,7 @@ menu {
     }
 }
 img {
-    min-width: 40px;
+    min-width: 70px;
 }
 img.small {
     max-width: 150px;
@@ -57,6 +61,7 @@ h1 {
 }
 .logo {
     height: 72px;
+    min-width: unset
 }
 a {
     text-decoration: none;
@@ -94,5 +99,19 @@ td[onclick] {
 
 .w3-row {
     display: flex;
+    align-items: center;
+}
+
+.w3-top {
+    width: 100vw !important;
+}
+
+footer.w3-section {
+    margin-bottom: 0 !important;
+}
+
+header>h1 {
+    display: flex;
+    justify-content: center;
     align-items: center;
 }
